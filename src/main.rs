@@ -125,7 +125,7 @@ fn main() {
 
 // Startup systems
 
-fn setup(mut commands: Commands, asset_server: Res<AssetServer>) {
+fn setup(mut commands: Commands) {
     // 2D camera
     commands.spawn_bundle(OrthographicCameraBundle::new_2d());
 
@@ -184,11 +184,11 @@ fn is_even(n: u32) -> bool {
 }
 
 fn get_path(piece: Piece) -> String {
-    let mut team = match piece.team {
+    let team = match piece.team {
         Teams::Black => "black",
         Teams::White => "white",
     };
-    let mut role = match piece.role {
+    let role = match piece.role {
         PieceRoles::Pawn => "pawn",
         PieceRoles::Rook => "rook",
         PieceRoles::Knight => "knight",
