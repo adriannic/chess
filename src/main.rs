@@ -106,6 +106,15 @@ struct Selected(Option<(u32, u32)>);
 
 struct Turn(Teams);
 
+impl Turn {
+    fn toggle(&mut self) {
+        self.0 = match self.0 {
+            Teams::White => Teams::Black,
+            Teams::Black => Teams::White,
+        }
+    }
+}
+
 #[derive(Component)]
 struct RemovalTag {}
 
@@ -208,7 +217,7 @@ fn draw_pieces(
 fn move_piece(
     mut board: ResMut<Board>,
     mut selected: ResMut<Selected>,
-    turn: Res<Turn>,
+    mut turn: ResMut<Turn>,
     windows: Res<Windows>,
     mouse_input: Res<Input<MouseButton>>,
 ) {
@@ -235,6 +244,7 @@ fn move_piece(
                 board.0[y as usize][x as usize] = board.0[pos.1 as usize][pos.0 as usize];
                 board.0[pos.1 as usize][pos.0 as usize] = None;
                 selected.0 = None;
+                turn.toggle();
             }
         }
     }
