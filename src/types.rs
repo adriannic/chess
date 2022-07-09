@@ -91,11 +91,6 @@ pub struct Pos {
 }
 
 impl Pos {
-    /// Returns the Manhattan distance between two positions.
-    pub fn dist(&self, other: &Pos) -> (i32, i32) {
-        (other.x - self.x, other.y - self.y)
-    }
-
     pub fn add(&self, x: i32, y: i32) -> Pos {
         Pos {
             x: self.x + x,
@@ -114,13 +109,6 @@ impl Pos {
         Pos {
             x: self.x * x,
             y: self.y * y,
-        }
-    }
-
-    pub fn mul_pos(&self, other: &Pos) -> Pos {
-        Pos {
-            x: self.x * other.x,
-            y: self.y * other.y,
         }
     }
 
