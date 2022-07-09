@@ -1,18 +1,26 @@
-use crate::types::*;
 use crate::constants::*;
+use crate::types::*;
 
 /// Represents the chess board
 pub struct Board(pub [[Option<Piece>; BOARD_SIZE]; BOARD_SIZE]);
 
 impl Board {
     pub fn get(&self, pos: &Pos) -> Option<Piece> {
-        self.0[pos.y][pos.x]
+        if pos.out_of_bounds() {
+            None
+        } else {
+            self.0[pos.y as usize][pos.x as usize]
+        }
     }
     pub fn set(&mut self, pos: &Pos, piece: Option<Piece>) {
-        self.0[pos.y][pos.x] = piece;
+        if !pos.out_of_bounds() {
+            self.0[pos.y as usize][pos.x as usize] = piece;
+        }
     }
     pub fn set_with_pos(&mut self, pos: &Pos, other: &Pos) {
-        self.0[pos.y][pos.x] = self.get(other);
+        if !pos.out_of_bounds() {
+            self.0[pos.y as usize][pos.x as usize] = self.get(other);
+        }
     }
 }
 
@@ -55,9 +63,6 @@ pub struct Turn(pub Teams);
 
 impl Turn {
     pub fn toggle(&mut self) {
-        self.0 = match self.0 {
-            Teams::White => Teams::Black,
-            Teams::Black => Teams::White,
-        }
+        self.0 = self.0.toggle();
     }
 }

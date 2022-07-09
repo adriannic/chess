@@ -1,8 +1,9 @@
-use bevy::prelude::*;
-use crate::tags::*;
 use crate::constants::*;
 use crate::resources::*;
+use crate::tags::*;
+use crate::types::*;
 use crate::util::*;
+use bevy::prelude::*;
 
 // Startup systems
 
@@ -23,7 +24,11 @@ pub fn setup(mut commands: Commands) {
                     custom_size: Some(Vec2::new(TILE_SIZE, TILE_SIZE)),
                     ..default()
                 },
-                transform: Transform::from_xyz(board_to_screen(i), board_to_screen(j), 1.0),
+                transform: Transform::from_xyz(
+                    board_to_screen(i as i32),
+                    board_to_screen(j as i32),
+                    1.0,
+                ),
                 ..default()
             });
         }
@@ -44,17 +49,25 @@ pub fn draw_pieces(
     }
 
     if let Some(pos) = selected.0 {
-        commands
-            .spawn_bundle(SpriteBundle {
-                sprite: Sprite {
-                    color: Color::rgba(0.0, 1.0, 0.0, 0.25),
-                    custom_size: Some(Vec2::new(TILE_SIZE, TILE_SIZE)),
+        let mut positions = get_valid_moves(&*board, &pos);
+        positions.push(pos);
+        for pos in positions.iter() {
+            commands
+                .spawn_bundle(SpriteBundle {
+                    sprite: Sprite {
+                        color: Color::rgba(0.0, 1.0, 0.0, 0.25),
+                        custom_size: Some(Vec2::new(TILE_SIZE, TILE_SIZE)),
+                        ..default()
+                    },
+                    transform: Transform::from_xyz(
+                        board_to_screen(pos.x),
+                        board_to_screen(pos.y),
+                        1.5,
+                    ),
                     ..default()
-                },
-                transform: Transform::from_xyz(board_to_screen(pos.x), board_to_screen(pos.y), 1.5),
-                ..default()
-            })
-            .insert(RemovalTag {});
+                })
+                .insert(RemovalTag {});
+        }
     }
 
     for y in 0..BOARD_SIZE {
@@ -63,7 +76,11 @@ pub fn draw_pieces(
                 commands
                     .spawn_bundle(SpriteBundle {
                         texture: asset_server.load(get_path(piece).as_str()),
-                        transform: Transform::from_xyz(board_to_screen(x), board_to_screen(y), 2.0),
+                        transform: Transform::from_xyz(
+                            board_to_screen(x as i32),
+                            board_to_screen(y as i32),
+                            2.0,
+                        ),
                         ..default()
                     })
                     .insert(RemovalTag {});
@@ -90,10 +107,17 @@ pub fn move_piece(
 
     if mouse_input.just_pressed(MouseButton::Left) {
         if let Some(selected_pos) = selected.0 {
-            board.set_with_pos(&cursor_pos, &selected_pos);
-            board.set(&selected_pos, None);
-            selected.0 = None;
-            turn.toggle();
+            if selected_pos == cursor_pos {
+                selected.0 = None;
+            } else {
+                if !get_valid_moves(&*board, &selected_pos).contains(&cursor_pos) {
+                    return;
+                }
+                board.set_with_pos(&cursor_pos, &selected_pos);
+                board.set(&selected_pos, None);
+                selected.0 = None;
+                turn.toggle();
+            }
         } else {
             if let Some(piece) = board.get(&cursor_pos) {
                 if piece.team == turn.0 {

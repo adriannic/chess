@@ -1,5 +1,7 @@
 // Chess piece
 
+use crate::constants::BOARD_SIZE;
+
 /// Enumerates all the possible roles of a chess piece
 #[derive(Clone, Copy, PartialEq)]
 pub enum Roles {
@@ -16,6 +18,15 @@ pub enum Roles {
 pub enum Teams {
     White,
     Black,
+}
+
+impl Teams {
+    pub fn toggle(&self) -> Teams {
+        match self {
+            Teams::White => Teams::Black,
+            Teams::Black => Teams::White,
+        }
+    }
 }
 
 /// Represents a chess piece
@@ -73,18 +84,54 @@ impl Piece {
 // Mathematical types
 
 /// Represents a board position
-#[derive(Clone, Copy, PartialEq)]
+#[derive(Clone, Copy, PartialEq, Debug)]
 pub struct Pos {
-    pub x: usize,
-    pub y: usize,
+    pub x: i32,
+    pub y: i32,
 }
 
 impl Pos {
     /// Returns the Manhattan distance between two positions.
-    pub fn diff(&self, other: &Pos) -> (i32, i32) {
-        (
-            other.x as i32 - self.x as i32,
-            other.y as i32 - self.y as i32,
-        )
+    pub fn dist(&self, other: &Pos) -> (i32, i32) {
+        (other.x - self.x, other.y - self.y)
+    }
+
+    pub fn add(&self, x: i32, y: i32) -> Pos {
+        Pos {
+            x: self.x + x,
+            y: self.y + y,
+        }
+    }
+
+    pub fn add_pos(&self, other: &Pos) -> Pos {
+        Pos {
+            x: self.x + other.x,
+            y: self.y + other.y,
+        }
+    }
+
+    pub fn mul(&self, x: i32, y: i32) -> Pos {
+        Pos {
+            x: self.x * x,
+            y: self.y * y,
+        }
+    }
+
+    pub fn mul_pos(&self, other: &Pos) -> Pos {
+        Pos {
+            x: self.x * other.x,
+            y: self.y * other.y,
+        }
+    }
+
+    pub fn inverse(&self) -> Pos {
+        Pos {
+            x: self.y,
+            y: self.x,
+        }
+    }
+
+    pub fn out_of_bounds(&self) -> bool {
+        self.x >= BOARD_SIZE as i32 || self.x < 0 || self.y >= BOARD_SIZE as i32 || self.y < 0
     }
 }
