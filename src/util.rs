@@ -166,6 +166,29 @@ pub fn get_valid_moves(board: &Board, piece_pos: &Pos) -> Vec<Pos> {
                     }
                 }
             }
+            // Castling
+            for i in (-2..=2).step_by(4) {
+                let candidate = piece_pos.add(i, 0);
+                let rook_pos = if i == -2 {
+                    Pos {
+                        x: 0,
+                        y: piece_pos.y,
+                    }
+                } else {
+                    Pos {
+                        x: 7,
+                        y: piece_pos.y,
+                    }
+                };
+                if !candidate.out_of_bounds()
+                    && !board.get(&piece_pos).unwrap().has_moved
+                    && board.get(&rook_pos) != None
+                    && board.get(&rook_pos).unwrap().role == Roles::Rook
+                    && !board.get(&rook_pos).unwrap().has_moved
+                    && board.get(&candidate) == None
+                    && board.get(&piece_pos.add(i / 2, 0)) == None
+                {}
+            }
         }
     }
 
@@ -177,5 +200,41 @@ pub fn is_pos_team(board: &Board, pos: &Pos, team: &Teams) -> bool {
         piece.team == *team
     } else {
         false
+    }
+}
+
+pub fn get_attacked_cells(board: &Board, team: &Teams) -> Vec<Pos> {
+    let mut possible_attacks = vec![];
+    for y in 0..8 {
+        for x in 0..8 {
+            let pos = Pos { x, y };
+            if let Some(piece) = board.get(&pos) {
+                if piece.team == *team {
+                    possible_attacks.push(get_valid_moves(&board, &pos));
+                }
+            }
+        }
+    }
+    let mut possible_attacks = possible_attacks.concat();
+    possible_attacks.sort_unstable();
+    possible_attacks.dedup();
+    possible_attacks
+}
+
+pub fn update_check_state(board: &Board, check: &mut Check) {
+    check.0 = None;
+    for y in 0..BOARD_SIZE {
+        for x in 0..BOARD_SIZE {
+            if let Some(piece) = board.0[y][x] {
+                if piece.role == Roles::King
+                    && get_attacked_cells(&board, &piece.team.toggle()).contains(&Pos {
+                        x: x as i32,
+                        y: y as i32,
+                    })
+                {
+                    check.0 = Some(piece.team);
+                }
+            }
+        }
     }
 }

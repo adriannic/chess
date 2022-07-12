@@ -3,7 +3,7 @@
 use crate::constants::BOARD_SIZE;
 
 /// Enumerates all the possible roles of a chess piece
-#[derive(Clone, Copy, PartialEq)]
+#[derive(Clone, Copy, PartialEq, Debug)]
 pub enum Roles {
     Pawn,
     Rook,
@@ -14,7 +14,7 @@ pub enum Roles {
 }
 
 /// Enumerates all the possible teams of a chess piece
-#[derive(Clone, Copy, PartialEq)]
+#[derive(Clone, Copy, PartialEq, Debug)]
 pub enum Teams {
     White,
     Black,
@@ -30,10 +30,11 @@ impl Teams {
 }
 
 /// Represents a chess piece
-#[derive(Clone, Copy, PartialEq)]
+#[derive(Clone, Copy, PartialEq, Debug)]
 pub struct Piece {
     pub role: Roles,
     pub team: Teams,
+    pub has_moved: bool,
 }
 
 impl Piece {
@@ -42,6 +43,7 @@ impl Piece {
         Piece {
             role: Roles::Pawn,
             team,
+            has_moved: false,
         }
     }
     /// Creates a new rook of the given team
@@ -49,6 +51,7 @@ impl Piece {
         Piece {
             role: Roles::Rook,
             team,
+            has_moved: false,
         }
     }
     /// Creates a new knight of the given team
@@ -56,6 +59,7 @@ impl Piece {
         Piece {
             role: Roles::Knight,
             team,
+            has_moved: false,
         }
     }
     /// Creates a new bishop of the given team
@@ -63,6 +67,7 @@ impl Piece {
         Piece {
             role: Roles::Bishop,
             team,
+            has_moved: false,
         }
     }
     /// Creates a new queen of the given team
@@ -70,6 +75,7 @@ impl Piece {
         Piece {
             role: Roles::Queen,
             team,
+            has_moved: false,
         }
     }
     /// Creates a new king of the given team
@@ -77,6 +83,7 @@ impl Piece {
         Piece {
             role: Roles::King,
             team,
+            has_moved: false,
         }
     }
 }
@@ -84,7 +91,7 @@ impl Piece {
 // Mathematical types
 
 /// Represents a board position
-#[derive(Clone, Copy, PartialEq, Debug)]
+#[derive(Clone, Copy, PartialEq, Eq, Debug, PartialOrd, Ord)]
 pub struct Pos {
     pub x: i32,
     pub y: i32,

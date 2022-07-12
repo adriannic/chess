@@ -26,6 +26,7 @@ fn main() {
         .insert_resource(Board::default())
         .insert_resource(Selected(None))
         .insert_resource(Turn(Teams::White))
+        .insert_resource(Check(None))
         .add_startup_system(setup)
         .add_system(draw_pieces)
         .add_system(move_piece)

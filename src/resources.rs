@@ -66,3 +66,5 @@ impl Turn {
         self.0 = self.0.toggle();
     }
 }
+
+pub struct Check(pub Option<Teams>);
